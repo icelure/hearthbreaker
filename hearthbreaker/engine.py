@@ -91,6 +91,45 @@ class Game(Bindable):
         for minion in sorted_minions:
             minion.activate_delayed()
 
+    def pre_game2(self):
+        if self.__pre_game_run:
+            return
+        self.__pre_game_run = True
+
+        p1_draw = [self.players[0].deck.draw(self) for i in range(3)]
+        p2_draw = [self.players[1].deck.draw(self) for i in range(4)]
+
+        card_keep_index = self.players[0].agent.do_card_check(p1_draw)
+        self.trigger("kept_cards", p1_draw, card_keep_index)
+        put_back_cards = []
+        for card_index in range(0, 3):
+            if not card_keep_index[card_index]:
+                put_back_cards.append(p1_draw[card_index])
+                p1_draw[card_index] = self.players[0].deck.draw(self)
+        self.players[0].hand = p1_draw
+        for card in put_back_cards:
+            self.players[0].put_back(card)
+        for card in self.players[0].hand:
+            card.attach(card, self.players[0])
+
+        card_keep_index = self.players[1].agent.do_card_check(p2_draw)
+        self.trigger("kept_cards", p2_draw, card_keep_index)
+        put_back_cards = []
+        for card_index in range(0, 4):
+            if not card_keep_index[card_index]:
+                put_back_cards.append(p2_draw[card_index])
+                p2_draw[card_index] = self.players[1].deck.draw(self)
+        self.players[1].hand = p2_draw
+        for card in put_back_cards:
+            self.players[1].put_back(card)
+
+        for card in self.players[1].hand:
+            card.attach(card, self.players[1])
+
+        coin = card_lookup("The Coin")
+        coin.player = self.players[1]
+        self.players[1].hand.append(coin)
+
     def pre_game(self):
         if self.__pre_game_run:
             return
