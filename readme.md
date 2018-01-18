@@ -1,3 +1,7 @@
+Target:
+    To use pygame to implement GUI part based on the exsiting protocal.
+
+Source Project:
 Hearthbreaker
 =============
 A Hearthstone Simulator
